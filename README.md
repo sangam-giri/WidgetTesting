@@ -9,6 +9,8 @@ This project demonstrates basic widget testing in Flutter, showcasing how to tes
 
 ## 🚀 How to Run Tests
 
+**Documentation:** [Flutter Widget Interaction CheatSheet](FlutterTesting.md)
+
 ### Option 1: Run All Tests
 ```bash
 flutter test
