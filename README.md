@@ -39,7 +39,34 @@ lib/
 ├── widgets/
 │   └── example_widget.dart # ExampleWidget implementation
 test/
-└── widget_test.dart        # All widget tests
+├── core/                       # Base test utilities
+│   ├── base_test.dart          # BaseTest class (with runSafeTest, etc.)
+│   ├── test_services.dart      # TestServices (common assertions)
+│   └── test_helpers.dart       # TestHelpers (pumpWidget, scroll, etc.)
+│
+├── unit/                       # Pure logic tests (no widgets)
+│   ├── services/               # Service layer tests
+│   ├── blocs/                  # BLoC/Cubit tests
+│   └── utils/                  # Utility/helper tests
+│
+├── widgets/                    # Component/widget tests
+│   ├── screens/                # Full-screen widget tests
+│   │   ├── home_screen_test.dart
+│   │   ├── counter_screen_test.dart
+│   │   └── ...
+│   │
+│   └── components/             # Reusable widgets
+│       ├── example_widget_test.dart
+│       ├── listview_widget_test.dart
+│       └── ...
+│
+├── integration/                # Full-flow tests (optional)
+│   ├── app_flows/              # Critical user journeys
+│   └── drivers/                # Flutter driver (if needed)
+│
+└── mocks/                      # Shared mock classes
+    ├── mock_repository.dart
+    └── ...
 ```
 
 ## 🛠️ Dependencies

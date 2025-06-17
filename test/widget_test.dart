@@ -2,145 +2,127 @@ import 'package:example_2/counter_screen.dart';
 import 'package:example_2/home_screen.dart';
 import 'package:example_2/widgets/example_widget.dart';
 import 'package:example_2/widgets/listview_widget.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'core/base_tests.dart';
+import 'core/test_helpers.dart';
+import 'core/test_services.dart';
+
 void main() {
   group('App Widget Tests', () {
-    List<String> passedTests = [];
+    final baseTest = BaseTest();
 
-    tearDownAll(() {
-      if (kDebugMode) {
-        print('Test passed! 🎉🔥🚀');
-        print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-      }
-
-      for (String passedTest in passedTests) {
-        if (kDebugMode) print('✅ $passedTest');
-      }
-    });
+    tearDownAll(() => baseTest.printTestResults());
 
     testWidgets('HomeScreen should display correct title and message', (
       tester,
     ) async {
-      //Arrange
-      const testTitle = 'T';
-      const testMessage = 'M';
+      await baseTest.runSafeTest(tester, 'HomeScreen test', (tester) async {
+        // Arrange
+        const testTitle = 'T';
+        const testMessage = 'M';
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: HomeScreen(title: testTitle, message: testMessage),
-          ),
-        ),
-      );
+        // Act
+        await TestHelpers.pumpMaterialWidget(
+          tester,
+          HomeScreen(title: testTitle, message: testMessage),
+        );
 
-      await tester.pumpAndSettle();
+        // Assert
+        await TestServices.verifyWidgetExists(
+          tester: tester,
+          finder: find.text(testTitle),
+          description: 'Title should be displayed',
+          passedTests: baseTest.passedTests,
+        );
 
-      final titleFinder = find.text('T');
-      final messageFinder = find.text('M');
-
-      /// Assert
-      expect(titleFinder, findsOneWidget, reason: 'Title should be displayed');
-      expect(
-        messageFinder,
-        findsOneWidget,
-        reason: 'Message should be displayed',
-      );
-
-      passedTests.add('HomeScreen displays correct content');
+        await TestServices.verifyWidgetExists(
+          tester: tester,
+          finder: find.text(testMessage),
+          description: 'Message should be displayed',
+          passedTests: baseTest.passedTests,
+        );
+      });
     });
 
     testWidgets(
       'Example Widget should have red color container with home icon',
       (tester) async {
-        // Arrange & Act
-        await tester.pumpWidget(TesterComponent(child: ExampleWidget()));
+        await baseTest.runSafeTest(tester, 'ExampleWidget test', (
+          tester,
+        ) async {
+          // Arrange & Act
+          await TestHelpers.pumpMaterialWidget(tester, ExampleWidget());
 
-        final container = tester.widget<Container>(
-          find.byType(Container).first,
-        );
+          // Assert
+          final container = tester.widget<Container>(
+            find.byType(Container).first,
+          );
+          expect(container.color, Colors.red);
+          baseTest.passedTests.add('Container has red color');
 
-        //Assert
-        expect(
-          container.color,
-          Colors.red,
-          reason: 'Container must have red color',
-        );
-        passedTests.add('Example Widget has a red colored container');
-
-        expect(
-          find.widgetWithIcon(Container, Icons.home),
-          findsOneWidget,
-          reason: 'Should contain home icon',
-        );
-        passedTests.add('Example Widget contains home icon');
+          await TestServices.verifyWidgetExists(
+            tester: tester,
+            finder: find.widgetWithIcon(Container, Icons.home),
+            description: 'Contains home icon',
+            passedTests: baseTest.passedTests,
+          );
+        });
       },
     );
 
     testWidgets('finds a deep item in a long list on ListViewWidget', (
-      widgetTester,
+      tester,
     ) async {
-      await widgetTester.pumpWidget(TesterComponent(child: ListviewWidget()));
+      await baseTest.runSafeTest(tester, 'ListViewWidget test', (tester) async {
+        // Arrange & Act
+        await TestHelpers.pumpMaterialWidget(tester, ListviewWidget());
 
-      final listFinder = find.byType(Scrollable); // Widget
-      final itemFinder = find.byKey(
-        const ValueKey('item_50_text'),
-      ); // Item to be found
+        // Act
+        await TestHelpers.scrollToItem(
+          tester,
+          itemFinder: find.byKey(const ValueKey('item_50_text')),
+        );
 
-      // Scroll until the item to be found appears.
-      await widgetTester.scrollUntilVisible(
-        itemFinder,
-        500.0,
-        scrollable: listFinder,
-      );
-
-      // Verify that the item contains the correct text.
-      expect(itemFinder, findsOneWidget);
-
-      passedTests.add('Item with key:item_50_text found');
+        // Assert
+        await TestServices.verifyWidgetExists(
+          tester: tester,
+          finder: find.byKey(const ValueKey('item_50_text')),
+          description: 'Found item_50_text',
+          passedTests: baseTest.passedTests,
+        );
+      });
     });
 
-    /// Test case for CounterScreen
     testWidgets(
       'Count must increase on tapping increaseCounter on CounterScreen',
-      (widgetTester) async {
-        // Build the widget
-        await widgetTester.pumpWidget(TesterComponent(child: CounterScreen()));
+      (tester) async {
+        await baseTest.runSafeTest(tester, 'CounterScreen test', (
+          tester,
+        ) async {
+          // Arrange
+          await TestHelpers.pumpMaterialWidget(tester, CounterScreen());
 
-        // Verify initial counter text
-        expect(find.text('Counter: 0'), findsOneWidget);
+          // Assert initial state
+          await TestServices.verifyWidgetText(
+            tester: tester,
+            finder: find.text('Counter: 0'),
+            expectedText: 'Counter: 0',
+            description: 'Initial counter value is 0',
+            passedTests: baseTest.passedTests,
+          );
 
-        passedTests.add('Counter text with initial value:0 found');
-
-        // Find the button and tap it
-        await widgetTester.tap(find.byKey(Key('increment-button')));
-
-        passedTests.add('Finds the Increase button');
-
-        // Trigger a rebuild after state change - Rebuilds the system to show new counter value.
-        // Similar to how setState((){}) works.
-        await widgetTester.pump();
-        passedTests.add('Updates the state with increase count');
-
-        // Verify the counter incremented
-        expect(find.text('Counter: 1'), findsOneWidget);
-
-        passedTests.add('Count increases by 1');
+          // Act & Assert
+          await TestServices.tapAndVerify(
+            tester: tester,
+            buttonFinder: find.byKey(const Key('increment-button')),
+            verificationFinder: find.text('Counter: 2'),
+            description: 'Counter increments on button tap',
+            passedTests: baseTest.passedTests,
+          );
+        });
       },
     );
   });
-}
-
-class TesterComponent extends StatelessWidget {
-  const TesterComponent({super.key, required this.child});
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(body: child is Scaffold ? child : Scaffold(body: child)),
-    );
-  }
 }
