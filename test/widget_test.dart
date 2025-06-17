@@ -1,5 +1,6 @@
 import 'package:example_2/home_screen.dart';
 import 'package:example_2/widgets/example_widget.dart';
+import 'package:example_2/widgets/listview_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -72,6 +73,29 @@ void main() {
         reason: 'Should contain home icon',
       );
       passedTests.add('Example Widget contains home icon');
+    });
+
+    testWidgets('finds a deep item in a long list', (widgetTester) async {
+      await widgetTester.pumpWidget(
+        MaterialApp(home: Scaffold(body: ListviewWidget())),
+      );
+
+      final listFinder = find.byType(Scrollable); // Widget
+      final itemFinder = find.byKey(
+        const ValueKey('item_50_text'),
+      ); // Item to be found
+
+      // Scroll until the item to be found appears.
+      await widgetTester.scrollUntilVisible(
+        itemFinder,
+        500.0,
+        scrollable: listFinder,
+      );
+
+      // Verify that the item contains the correct text.
+      expect(itemFinder, findsOneWidget);
+
+      passedTests.add('Item with key:item_50_text found');
     });
   });
 }
