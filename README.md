@@ -17,13 +17,13 @@ flutter test
 ### Option 2: Run Specific Test Groups
 ```bash
 # Test all widgets in the 'App' group
-flutter test --plain-name "App"
+flutter test --plain-name "App Widget Tests"
 
 # Test only HomeScreen related tests
-flutter test --plain-name "HomeScreen"
+flutter test --plain-name "HomeScreen should display correct title and message"
 
 # Test only ExampleWidget related tests
-flutter test --plain-name "Example Widget"
+flutter test --plain-name "'Example Widget should have red color container with home icon'"
 ```
 
 ### Option 3: Run with Coverage Report
